@@ -1,7 +1,7 @@
 import os
-
+from loguru import logger
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold
 
 from ml.data import process_data
 from ml.model import (
@@ -14,15 +14,22 @@ from ml.model import (
 )
 
 # TODO: load the cencus.csv data
-project_path = "Your path here"
+project_path = "./"
 data_path = os.path.join(project_path, "data", "census.csv")
 print(data_path)
-data = ""  # your code here
+logger.info(f"Data Location: {data_path}")
+data = data_path  # your code here
 
 # TODO: split the provided data to have a train dataset and a test dataset
 # Optional enhancement, use K-fold cross validation instead of a train-test split.
-train, test = ""  # Your code here
+# train, test = KFold(n_splits=2, shuffle=True, random_state=42)
+kfold = KFold(n_splits=2, shuffle=True, random_state=42)
 
+train, test = kfold.split(data_path)
+logger.info(f"(Sample: {train[:3]}")
+logger.info(f"(Sample: {test[:3]}")
+# Your code here
+# exit()
 # DO NOT MODIFY
 cat_features = [
     "workclass",
@@ -37,6 +44,10 @@ cat_features = [
 
 # TODO: use the process_data function provided to process the data.
 X_train, y_train, encoder, lb = process_data(
+    train,
+    categorical_features=cat_features,
+    label="salary",
+    training=True,
     # your code here
     # use the train dataset
     # use training=True
@@ -53,7 +64,7 @@ X_test, y_test, _, _ = process_data(
 )
 
 # TODO: use the train_model function to train the model on the training dataset
-model = ""  # your code here
+model = process_data()  # your code here
 
 # save the model and the encoder
 model_path = os.path.join(project_path, "model", "model.pkl")
@@ -65,7 +76,7 @@ save_model(encoder, encoder_path)
 model = load_model(model_path)
 
 # TODO: use the inference function to run the model inferences on the test dataset.
-preds = ""  # your code here
+preds = model.predict()  # your code here
 
 # Calculate and print the metrics
 p, r, fb = compute_model_metrics(y_test, preds)
