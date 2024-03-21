@@ -20,7 +20,7 @@ data = # your code here
 
 # TODO: split the provided data to have a train dataset and a test dataset
 # Optional enhancement, use K-fold cross validation instead of a train-test split.
-train, test = # Your code here
+train, test =  '' # Your code here
 
 # DO NOT MODIFY
 cat_features = [
@@ -37,7 +37,7 @@ cat_features = [
 # TODO: use the process_data function provided to process the data.
 X_train, y_train, encoder, lb = process_data(
     # your code here
-    # use the train dataset 
+    # use the train dataset
     # use training=True
     # do not need to pass encoder and lb as input
     )
@@ -52,7 +52,7 @@ X_test, y_test, _, _ = process_data(
 )
 
 # TODO: use the train_model function to train the model on the training dataset
-model = # your code here
+model = '' # your code here
 
 # save the model and the encoder
 model_path = os.path.join(project_path, "model", "model.pkl")
@@ -63,10 +63,10 @@ save_model(encoder, encoder_path)
 # load the model
 model = load_model(
     model_path
-) 
+)
 
 # TODO: use the inference function to run the model inferences on the test dataset.
-preds = # your code here
+preds = '' # your code here
 
 # Calculate and print the metrics
 p, r, fb = compute_model_metrics(y_test, preds)

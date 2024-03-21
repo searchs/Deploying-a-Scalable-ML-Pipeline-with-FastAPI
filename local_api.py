@@ -3,13 +3,12 @@ import json
 import requests
 
 # TODO: send a GET using the URL http://127.0.0.1:8000
-r = # Your code here
+# r = # Your code here
 
 # TODO: print the status code
 # print()
 # TODO: print the welcome message
 # print()
-
 
 
 data = {
@@ -30,7 +29,7 @@ data = {
 }
 
 # TODO: send a POST using the data above
-r = # Your code here
+# r = # Your code here
 
 # TODO: print the status code
 # print()
