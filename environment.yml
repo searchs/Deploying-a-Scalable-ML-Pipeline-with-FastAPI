@@ -14,4 +14,5 @@ dependencies:
   - gunicorn=20.1.0
   - pip=20.3.3
   - git=2.30.2
+  - loguru=0.7.2
   - ruff=0.3.3

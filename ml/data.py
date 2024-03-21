@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import LabelBinarizer, OneHotEncoder
+from loguru import logger
 
 
 def process_data(
@@ -63,8 +64,8 @@ def process_data(
         try:
             y = lb.transform(y.values).ravel()
         # Catch the case where y is None because we're doing inference.
-        except AttributeError:
-            pass
+        except AttributeError as ae:
+            logger.debug(f"Looks like the value of y is None and we need a value: {ae}")
 
     X = np.concatenate([X_continuous, X_categorical], axis=1)
     return X, y, encoder, lb
