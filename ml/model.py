@@ -1,7 +1,14 @@
 import pickle
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from ml.data import process_data
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+import joblib
 # TODO: add necessary import
+
 
 # Optional: implement hyperparameter tuning.
 def train_model(X_train, y_train):
@@ -20,7 +27,46 @@ def train_model(X_train, y_train):
         Trained machine learning model.
     """
     # TODO: implement the function
-    pass
+
+
+# Load data
+data_path = "../data/census.csv"
+df = pd.read_csv(data_path)
+
+# Clean column names (strip spaces)
+df.columns = [col.strip() for col in df.columns]
+
+# Replace missing values denoted by '?'
+df.replace("?", pd.NA, inplace=True)
+df.dropna(inplace=True)
+
+# Encode categorical variables
+label_encoders = {}
+for column in df.select_dtypes(include=["object"]).columns:
+    le = LabelEncoder()
+    df[column] = le.fit_transform(df[column])
+    label_encoders[column] = le
+
+# Split data
+X = df.drop("salary", axis=1)
+y = df["salary"]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Train model
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
+
+# Evaluate model
+y_pred = model.predict(X_test)
+report = classification_report(y_test, y_pred, output_dict=True)
+
+# Save model
+model_path = "../model/census_model.pkl"
+joblib.dump((model, label_encoders), model_path)
+
+report, model_path
 
 
 def compute_model_metrics(y, preds):
@@ -46,7 +92,7 @@ def compute_model_metrics(y, preds):
 
 
 def inference(model, X):
-    """ Run model inferences and return the predictions.
+    """Run model inferences and return the predictions.
 
     Inputs
     ------
@@ -60,10 +106,12 @@ def inference(model, X):
         Predictions from the model.
     """
     # TODO: implement the function
-    pass
+    preds = model.predict(X)
+    return preds
+
 
 def save_model(model, path):
-    """ Serializes model to a file.
+    """Serializes model to a file.
 
     Inputs
     ------
@@ -73,18 +121,19 @@ def save_model(model, path):
         Path to save pickle file.
     """
     # TODO: implement the function
-    pass
+    joblib.dump(model, path)
+
 
 def load_model(path):
-    """ Loads pickle file from `path` and returns it."""
+    """Loads pickle file from `path` and returns it."""
     # TODO: implement the function
-    pass
+    return joblib.load(path)
 
 
 def performance_on_categorical_slice(
     data, column_name, slice_value, categorical_features, label, encoder, lb, model
 ):
-    """ Computes the model metrics on a slice of the data specified by a column name and
+    """Computes the model metrics on a slice of the data specified by a column name and
 
     Processes the data using one hot encoding for the categorical features and a
     label binarizer for the labels. This can be used in either training or
@@ -118,11 +167,22 @@ def performance_on_categorical_slice(
 
     """
     # TODO: implement the function
+
+    slice_data = data[data[column_name] == slice_value]
+
+    # Process the data slice (assumes you have a `process_data` utility function)
     X_slice, y_slice, _, _ = process_data(
-        # your code here
-        # for input data, use data in column given as "column_name", with the slice_value 
-        # use training = False
+        slice_data,
+        categorical_features=categorical_features,
+        label=label,
+        training=False,
+        encoder=encoder,
+        lb=lb,
     )
-    preds = None # your code here to get prediction on X_slice using the inference function
+
+    # Get predictions
+    preds = inference(model, X_slice)
+
+    # Now compute metrics
     precision, recall, fbeta = compute_model_metrics(y_slice, preds)
     return precision, recall, fbeta
