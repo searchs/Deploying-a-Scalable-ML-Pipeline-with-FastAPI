@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 import joblib
+from loguru import logger
 # TODO: add necessary import
 
 
@@ -28,45 +29,52 @@ def train_model(X_train, y_train):
     """
     # TODO: implement the function
 
+    # Load data
+    data_path = "data/census.csv"
 
-# Load data
-data_path = "../data/census.csv"
-df = pd.read_csv(data_path)
+    try:
+        df = pd.read_csv(data_path)
+        df.describe()
+        df.info()
+        df.head()
+    except IOError as ie:
+        logger.info(f"Error reading the data file: {ie}")
+        raise Exception("Data file not found or inaccessible.")
 
-# Clean column names (strip spaces)
-df.columns = [col.strip() for col in df.columns]
+    # Clean column names (strip spaces)
+    df.columns = [col.strip() for col in df.columns]
 
-# Replace missing values denoted by '?'
-df.replace("?", pd.NA, inplace=True)
-df.dropna(inplace=True)
+    # Replace missing values denoted by '?'
+    df.replace("?", pd.NA, inplace=True)
+    df.dropna(inplace=True)
 
-# Encode categorical variables
-label_encoders = {}
-for column in df.select_dtypes(include=["object"]).columns:
-    le = LabelEncoder()
-    df[column] = le.fit_transform(df[column])
-    label_encoders[column] = le
+    # Encode categorical variables
+    label_encoders = {}
+    for column in df.select_dtypes(include=["object"]).columns:
+        le = LabelEncoder()
+        df[column] = le.fit_transform(df[column])
+        label_encoders[column] = le
 
-# Split data
-X = df.drop("salary", axis=1)
-y = df["salary"]
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+    # Split data
+    X = df.drop("salary", axis=1)
+    y = df["salary"]
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-# Train model
-model = RandomForestClassifier(random_state=42)
-model.fit(X_train, y_train)
+    # Train model
+    model = RandomForestClassifier(random_state=42)
+    model.fit(X_train, y_train)
 
-# Evaluate model
-y_pred = model.predict(X_test)
-report = classification_report(y_test, y_pred, output_dict=True)
+    # Evaluate model
+    y_pred = model.predict(X_test)
+    report = classification_report(y_test, y_pred, output_dict=True)
 
-# Save model
-model_path = "../model/census_model.pkl"
-joblib.dump((model, label_encoders), model_path)
+    # Save model
+    model_path = "model/census_model.pkl"
+    joblib.dump((model, label_encoders), model_path)
 
-report, model_path
+    report, model_path
 
 
 def compute_model_metrics(y, preds):
